@@ -3,7 +3,7 @@ var JPF = {}; //Joe's Particle Fun
 
 JPF.startTime = (new Date()).getTime();
 JPF.clockTime = 0;
-JPF.lastFrameTime = 0;
+JPF.lastFrameTime = -1;
 JPF.fps = 0;
 
 JPF.mouse = "up";
@@ -35,7 +35,19 @@ window.onload = function(){
 JPF.gameLoop = function(time){
 	var ctx = JPF.ctx;
 	
-	JPF.updateParticles(time - JPF.lastFrameTime);
+	if(JPF.lastFrameTime > 0){
+		var dTime = time - JPF.lastFrameTime;
+
+
+		var minStep = 400;
+		while(dTime > minStep){
+			JPF.updateParticles(minStep);
+			dTime -= minStep;
+		}
+
+		JPF.updateParticles(dTime);
+		
+	}
 	JPF.drawGame();
 
 	if(JPF.dirtyCanvas){
@@ -54,7 +66,7 @@ JPF.gameLoop = function(time){
 		
 		//Save game
 		if(JPF.toSaveGame){
-			JPF.saveGameState();
+			// JPF.saveGameState();
 			JPF.toSaveGame = false;
 		}
 	}
@@ -70,29 +82,6 @@ JPF.startGame = function(){
 	JPF.dirtyCanvas = true;
 	JPF.wonGame = false;
 };
-
-JPF.loadGameState = function() {
-	if (!supports_html5_storage()) { return false; }
-	JPF.gameInProgress = (localStorage["JPF.gameInProgress"] == "true");
-
-	if(JPF.gameInProgress){
-		JPF.maxLevel = parseInt(localStorage["JPF.maxLevel"]);
-		JPF.wonGame = (localStorage["JPF.wonGame"] == "true");
-		JPF.level = parseInt(localStorage["JPF.level"]);
-		JPF.map = JSON.parse(localStorage["JPF.map"]);
-	}
-}
-
-JPF.saveGameState = function() {
-	if (!supports_html5_storage()) { return false; }
-	// localStorage["JPF.gameInProgress"] = true; //temp disable for testing
-
-	localStorage["JPF.maxLevel"] = JPF.maxLevel;
-	localStorage["JPF.wonGame"] = JPF.wonGame;
-	localStorage["JPF.level"] = JPF.level;
-
-	localStorage["JPF.map"] = JSON.stringify(JPF.map);
-}
 
 JPF.startSession = function(){
 	JPF.canvas = document.getElementById("canvas");
@@ -115,7 +104,7 @@ JPF.startSession = function(){
 	// console.log(w,h);
 	JPF.renderBox = [20,20,w-20,h-20];
 
-	JPF.loadGameState();
+	// JPF.loadGameState();
 
 	//Start new game
 	if(!JPF.gameInProgress){
@@ -194,7 +183,9 @@ JPF.drawParicles = function(){
 
 		particle.color[3] = 0.5*Math.pow(Math.pow(particle.vx,2)+Math.pow(particle.vy,2),0.25);
 
+		// console.log(pos[0],pos[1],r);
 		ctx.fillStyle = JPF.arrayColorToString(particle.color);
+		// console.log(JPF.arrayColorToString(particle.color))
 		ctx.fill();
 	}
 
