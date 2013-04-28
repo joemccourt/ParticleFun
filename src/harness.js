@@ -1,8 +1,6 @@
 //JPF vars
 var JPF = {}; //Joe's Particle Fun
 
-var kongregate = parent.kongregate;
-
 JPF.startTime = (new Date()).getTime();
 JPF.clockTime = 0;
 JPF.lastFrameTime = 0;
@@ -159,19 +157,6 @@ JPF.mousedown = function(x,y){
 
 JPF.mouseup = function(x,y){
 	JPF.mouse = "up";
-};
-
-JPF.winGame = function(){
-	if(JPF.level == JPF.maxLevel){
-		JPF.maxLevel++;
-
-		if(typeof kongregate !== "undefined"){
-			kongregate.stats.submit("Max Level",JPF.maxLevel);
-		}
-
-	}
-
-	JPF.wonGame = true;
 };
 
 // *** Canvas Drawing ***
